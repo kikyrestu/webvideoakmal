@@ -19,15 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Auto-create storage symlink for shared hosting (no SSH needed)
+        // Auto-create storage symlink for shared hosting (no SSH/exec needed)
         $link = public_path('storage');
         $target = storage_path('app/public');
         if (! is_link($link) && ! is_dir($link)) {
-            if (PHP_OS_FAMILY === 'Windows') {
-                symlink($target, $link);
-            } else {
-                app()->make('files')->link($target, $link);
-            }
+            @symlink($target, $link);
         }
     }
 }

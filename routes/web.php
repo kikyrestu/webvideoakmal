@@ -7,12 +7,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public Pages ────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/video/{slug}', [VideoController::class, 'show'])->name('videos.show');
 Route::get('/group/{slug}', [GroupController::class, 'show'])->name('groups.show');
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categories.show');

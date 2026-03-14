@@ -2,6 +2,33 @@
 
 @section('title', setting('site_name', 'Video Portal') . ' — Portal Video Online')
 
+@push('head')
+@php
+    $allHomeVideos = collect();
+    foreach(($groupsQuery ?? collect()) as $g) {
+        $allHomeVideos = $allHomeVideos->merge($g->videos);
+    }
+    $allHomeVideos = $allHomeVideos->merge($ungroupedVideos ?? collect())->take(20);
+@endphp
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "ItemList",
+    "name": "{{ addslashes(setting('site_name', 'Video Portal')) }}",
+    "itemListElement": [
+        @foreach($allHomeVideos as $i => $hv)
+        {
+            "@@type": "ListItem",
+            "position": {{ $i + 1 }},
+            "url": "{{ url('/video/' . $hv->slug) }}",
+            "name": "{{ addslashes($hv->title) }}"
+        }{{ !$loop->last ? ',' : '' }}
+        @endforeach
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 
 {{-- Group Filter Chips --}}

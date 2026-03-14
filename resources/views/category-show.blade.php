@@ -1,5 +1,41 @@
 @extends('layouts.app')
 @section('title', $category->name . ' — ' . setting('site_name', 'Video Portal'))
+
+@push('head')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "CollectionPage",
+    "name": "{{ addslashes($category->name) }}",
+    "url": "{{ url('/category/' . $category->slug) }}",
+    "mainEntity": {
+        "@@type": "ItemList",
+        "numberOfItems": {{ $videos->total() }},
+        "itemListElement": [
+            @foreach($videos->take(10) as $i => $v)
+            {
+                "@@type": "ListItem",
+                "position": {{ $i + 1 }},
+                "url": "{{ url('/video/' . $v->slug) }}",
+                "name": "{{ addslashes($v->title) }}"
+            }{{ !$loop->last ? ',' : '' }}
+            @endforeach
+        ]
+    }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+        {"@@type": "ListItem", "position": 2, "name": "{{ addslashes($category->name) }}"}
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 
 <div class="page-header">

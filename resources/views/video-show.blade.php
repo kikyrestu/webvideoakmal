@@ -12,16 +12,45 @@
 {
     "@@context": "https://schema.org",
     "@@type": "VideoObject",
+    "@@id": "{{ url('/video/' . $video->slug) }}",
     "name": "{{ addslashes($video->title) }}",
     "description": "{{ addslashes(Str::limit(strip_tags($video->description ?? ''), 200)) }}",
     "thumbnailUrl": "{{ $video->thumbnail_path ? Storage::url($video->thumbnail_path) : '' }}",
     "uploadDate": "{{ $video->published_at?->toIso8601String() }}",
     "duration": "{{ $video->duration ? 'PT'.gmdate('H\Hi\Ms\S', $video->duration) : '' }}",
+    @if($video->getEmbedType() === 'upload')
+    "contentUrl": "{{ Storage::url($video->video_path) }}",
+    @elseif($video->embed_url)
+    "embedUrl": "{{ $video->embed_url }}",
+    @endif
     "interactionStatistic": {
         "@@type": "InteractionCounter",
         "interactionType": "https://schema.org/WatchAction",
         "userInteractionCount": {{ $video->views_count }}
     }
+    @if($ratingsCount > 0)
+    ,"aggregateRating": {
+        "@@type": "AggregateRating",
+        "ratingValue": {{ number_format($averageRating, 1) }},
+        "bestRating": 5,
+        "ratingCount": {{ $ratingsCount }}
+    }
+    @endif
+}
+</script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+        @if($video->group)
+        {"@@type": "ListItem", "position": 2, "name": "{{ addslashes($video->group->name) }}", "item": "{{ url('/group/' . $video->group->slug) }}"},
+        {"@@type": "ListItem", "position": 3, "name": "{{ addslashes($video->title) }}"}
+        @else
+        {"@@type": "ListItem", "position": 2, "name": "{{ addslashes($video->title) }}"}
+        @endif
+    ]
 }
 </script>
 @endpush
